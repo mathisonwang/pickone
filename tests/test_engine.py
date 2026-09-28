@@ -456,11 +456,15 @@ class TestAdvisor(unittest.TestCase):
         kinds = [c["kind"] for c in d["cards"]]
         self.assertEqual(kinds, ["GO"],
                          f"只应有一张 GO 牌，实际 cards kinds={kinds}")
-        # 分差小时，收尾句要劝退纠结（"不值得"/"半小时"/"先去"任一即可）
+        # 分差小时，收尾句要劝退纠结：行动导向、短、不说教
+        # （2026-09-28 文案改版：不再用"不值得你想半小时"这种否定式说教，
+        #  改为"去试试"这类直接交还行动权的短句）
         closing = d.get("ask_user", "")
         self.assertTrue(
-            any(k in closing for k in ("纠结", "不值得", "半小时", "先去")),
+            any(k in closing for k in ("去试试", "去就行", "去就好", "先去")),
             f"伪选择时收尾句应劝退纠结，实际 ask_user={closing!r}")
+        self.assertLessEqual(len(closing), 12,
+                             f"收尾句应短（≤12字），实际 {len(closing)} 字：{closing!r}")
         # 理由只讲优点：不得出现比较性或"被拦"表述
         for w in d["cards"][0]["why"]:
             self.assertNotIn("比", w, f"理由不应含比较性表述：{w!r}")

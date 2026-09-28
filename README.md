@@ -7,6 +7,15 @@
 
 ---
 
+## 交付物
+
+| 项 | 位置 |
+|---|---|
+| 演示视频 | [`pickone_demo.mp4`](pickone_demo.mp4)（67.7s，另附 [`pickone_demo_720p.mp4`](pickone_demo_720p.mp4) 上传版） |
+| 项目报告书 | [`docs/REPORT.md`](docs/REPORT.md) |
+| 参赛征文 | [`docs/ESSAY.md`](docs/ESSAY.md) |
+| 在线演示 | `http://192.168.110.55:8888` |
+
 ## 这是什么
 
 一个跑在 [mxagent](https://nvidia.atlassian.net/wiki/spaces/MXAIPROD)（MMPLEX 分层多智能体框架）之上的 **Web App**：

@@ -66,12 +66,10 @@ video/vo/
 video/frames/
 video/audio/
 video/BGM/
-video/*.bak
-video/*.bak2
-video/*_bak/
+video/*.bak*
+video/video/*_bak/
 video/vo_movie_bak/
 video/__pycache__/
 video/
-*.mp4
-*.bak
+*.bak*
 *.bak2
