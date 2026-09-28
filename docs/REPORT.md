@@ -210,7 +210,7 @@ mxagent --task "..." --level 2 --snapshot data/snapshots/<decision_id>/
 
 ### 5.4 能力复用与成本透明
 
-- **`agent2tool` / `--as_mcp`**：抽取器 / 推演器 / 解释器作为**可复用 agent 能力**分层组合，不是三个耦合的 Python 函数。`engine/agents/` 下沉淀了 `extractor.yaml` / `timeline.yaml` / `explainer.yaml` 三个 agent 配置。换模型、换抽取策略不动推演器。
+- **`agent2tool` / `--as_mcp`**：抽取器 / 推演器 / 解释器作为**可复用 agent 能力**分层组合，不是三个耦合的 Python 函数。`engine/agents/` 下沉淀了 `extractor.yaml` / `timeline.yaml` / `explainer.yaml` 三个 agent 配置，换模型、换抽取策略不动推演器。
 - **`--cost_limit`**：每次决策成本透明。**`--result_check`**：自动校验输出理由是否自洽，失败自动重试（重试 1 次，再失败走降级）。
 
 ### 5.5 能力映射总表
@@ -312,7 +312,7 @@ $ python asr/transcribe.py asr/.tmp/e1_workout.webm --lang zh
 
 ### 6.7 演示视频
 
-`video/pickone_demo.mp4`：时长 67.700s，1440x900 @ 30fps（2031 帧），H.264 + AAC 192kbps，5,754,614 bytes。字幕已烧录（ASS + Noto Sans CJK SC），22 句中文解说（`zh-CN-YunjianNeural`，句间间隔 0.2s，语音总长 41.956s 由 ffprobe 逐句实测），BGM 为 ffmpeg 正弦合成 pad（CC0 零版权）。**画面 100% 真实录屏**（11 个片段，无 Ken Burns、无尾帧定格）。音画同步用能量包络 onset 检测客观验证：字幕→实际出声偏差 mean = 0.0ms、std = 0.0ms（`video/qc_sync.py` 实测）。
+`pickone_demo.mp4`（仓库根目录，另附 `pickone_demo_720p.mp4` 上传版）：时长 **67.700s**，1440x900 @ 30fps（2031 帧），H.264 + AAC 192kbps，5,754,614 bytes。字幕已烧录（ASS + Noto Sans CJK SC），22 句中文解说（`zh-CN-YunjianNeural`，句间间隔 0.2s，语音总长 41.956s 由 ffprobe 逐句实测），BGM 为 ffmpeg 正弦合成 pad（CC0 零版权），音量 0.14 + sidechain ducking。**画面 100% 真实录屏**（8 幕 + 3 个补充片段，无 Ken Burns、无尾帧定格）。**17 段静音全部 ≤ 3.5s**（ffmpeg silencedetect 实测，最长 3.285s）——为此对长静音窗口做了分段线性变速（视频/音频/字幕共用同一张映射表，从机制上保证三者同步）。
 
 ---
 
