@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0f1f">
+<title>PickOne · Attention is what we save</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<!-- ===================== 背景装饰 ===================== -->
+<div class="bg-orbs" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<!-- ===================== 顶部栏 ===================== -->
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-logo">🫧</span>
+    <span class="brand-name">PickOne</span>
+    <span class="brand-tag">帮选择困难的人，把纠结变成决定</span>
+  </div>
+  <div class="topbar-right">
+    <span id="api-pill" class="pill pill-gray" title="后端连接状态">连接中…</span>
+    <span id="mock-pill" class="pill pill-purple hidden">演示数据</span>
+  </div>
+</header>
+
+<!-- ===================== Tab 导航 ===================== -->
+<nav class="tabbar" role="tablist">
+  <button class="tab active" data-tab="tab-ask" role="tab">🏠 帮我选</button>
+  <button class="tab" data-tab="tab-profile" role="tab">👤 我的档案</button>
+  <button class="tab" data-tab="tab-history" role="tab">🗂 历史决策</button>
+</nav>
+
+<main class="page">
+
+<!-- ============================================================ -->
+<!-- Tab 1 · 帮我选 -->
+<!-- ============================================================ -->
+<section id="tab-ask" class="tab-panel active">
+
+  <!-- ---------- 首页输入区 ---------- -->
+  <div id="view-input" class="view">
+    <div class="hero">
+      <p class="hero-kicker">Attention is what we save.</p>
+      <h1 class="hero-title">纠结什么，<span class="grad-text">说给我听</span></h1>
+      <p class="hero-sub">把今晚的选项和心里的纠结一股脑倒出来，AI 帮你想清楚，还告诉你为什么。</p>
+    </div>
+
+    <div class="card glass input-card">
+      <label class="field-label" for="input-text">你的纠结（越具体越好）</label>
+      <textarea id="input-text" rows="5"
+        placeholder="例如：今晚是去健身房跑步，还是去楼下那家火锅店，或者在家看电影？跑步单程要40分钟，火锅一个人吃有点尴尬，电影又怕被剧透；预算今晚不超过100块，明早7点还要起床上班…"></textarea>
+
+      <div class="input-actions">
+        <button id="btn-voice" class="btn btn-ghost" type="button" title="语音输入">
+          <span class="mic-icon">🎙️</span><span id="voice-label">语音说</span>
+        </button>
+        <div class="demo-case">
+          <label class="sr-only" for="select-demo">填入纠结样例</label>
+          <select id="select-demo">
+            <option value="">✨ 一键填入纠结样例</option>
+          </select>
+        </div>
+      </div>
+
+      <button id="btn-submit" class="btn btn-primary btn-big" type="button">
+        <span class="btn-main">🧠 帮我想清楚</span>
+        <span class="btn-sub">认真推演大约需要 1~3 分钟，值得等</span>
+      </button>
+      <p id="input-error" class="form-error hidden"></p>
+    </div>
+
+    <div class="trust-row">
+      <div class="trust-item"><b>①</b> 说清选项和纠结点</div>
+      <div class="trust-item"><b>②</b> AI 推演今晚和未来 48 小时</div>
+      <div class="trust-item"><b>③</b> 只给你一个结论，和它的好处</div>
+    </div>
+  </div>
+
+  <!-- ---------- 等待 / 推演可视化 ---------- -->
+  <div id="view-wait" class="view hidden">
+    <div class="card glass wait-card">
+      <div class="brain-wrap">
+        <div class="brain-ring r1"></div>
+        <div class="brain-ring r2"></div>
+        <div class="brain-ring r3"></div>
+        <div class="brain-core"><span id="wait-emoji">🧠</span></div>
+      </div>
+      <div id="wait-stage" class="wait-stage">正在理解你的纠结…</div>
+      <div id="wait-sub" class="wait-sub">AI 正在把每个选项的今晚和未来 48 小时都推演一遍</div>
+      <div class="progress-track"><div id="wait-progress" class="progress-fill"></div></div>
+      <div class="wait-meta">
+        <span id="wait-timer">已等待 0 秒</span>
+        <span id="wait-eta">通常 1~3 分钟</span>
+      </div>
+      <div id="wait-steps" class="wait-steps"></div>
+      <div class="wait-foot">
+        <span class="wait-tip" id="wait-tip">💡 纠结的本质往往是信息不够，AI 正在帮你补齐。</span>
+        <span class="wait-actions">
+          <button id="btn-cancel-wait" class="btn btn-ghost btn-sm" type="button">算了，不等了</button>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- 结果区 ---------- -->
+  <div id="view-result" class="view hidden">
+
+    <!-- 置信度 + 不确定项 -->
+    <div class="card glass conf-card">
+      <div class="conf-ring-box">
+        <svg class="conf-ring" viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+          <circle id="conf-arc" class="ring-fg" cx="60" cy="60" r="52"></circle>
+        </svg>
+        <div class="conf-num"><b id="conf-percent">0%</b><span>置信度</span></div>
+      </div>
+      <div class="conf-text">
+        <div id="conf-verdict" class="conf-verdict">想清楚了</div>
+        <p id="conf-uncertain" class="conf-uncertain"></p>
+        <p id="conf-degraded-tip" class="tip-yellow hidden">⚠️ AI 引擎暂时不可用，本次为快速启发式结果</p>
+      </div>
+    </div>
+
+    <!-- 收尾一句（不逼用户补信息） -->
+    <div class="card glass ask-card">
+      <div class="ask-title">💬 <span id="ask-question">这个选择不值得你想半小时，先去试试。</span></div>
+      <p id="ask-hint" class="hint">信息不全也能定。真去做了，答案自己会浮现。</p>
+    </div>
+
+    <!-- 只给一个结论 -->
+    <h2 class="section-title">🎯 就这个，别想了</h2>
+    <div id="cards-area" class="cards-area"></div>
+
+    <!-- 被选中选项的维度（只展示这一个） -->
+    <h2 class="section-title">📊 它强在哪</h2>
+    <div id="compare-area" class="card glass compare-card"></div>
+
+    <!-- 幕后推理树 -->
+    <details class="card glass tree-card" id="tree-details">
+      <summary class="tree-summary">🔍 幕后：AI 是怎么想的<span class="tree-summary-hint">点开看看推演过程</span></summary>
+      <div id="tree-area" class="tree-area"></div>
+    </details>
+
+    <!-- 后悔闭环打卡 -->
+    <div class="card glass feedback-card" id="feedback-card">
+      <h3 class="fb-title">🌙 昨晚去了吗？感觉如何？</h3>
+      <p class="fb-sub">回来打个卡，下次推荐会更懂你。</p>
+      <div class="fb-row">
+        <label class="sr-only" for="fb-chosen">你最后选了</label>
+        <select id="fb-chosen"></select>
+        <span class="fb-label">去了吗</span>
+        <div class="seg" id="fb-went">
+          <button type="button" class="seg-btn active" data-v="1">去了</button>
+          <button type="button" class="seg-btn" data-v="0">没去</button>
+        </div>
+      </div>
+      <div class="fb-row">
+        <span class="fb-label">满意度</span>
+        <div class="stars" id="fb-stars">
+          <button type="button" class="star" data-v="1">★</button>
+          <button type="button" class="star" data-v="2">★</button>
+          <button type="button" class="star" data-v="3">★</button>
+          <button type="button" class="star" data-v="4">★</button>
+          <button type="button" class="star" data-v="5">★</button>
+          <span id="fb-stars-label" class="stars-label">点一下星星</span>
+        </div>
+      </div>
+      <div class="fb-row">
+        <label class="sr-only" for="fb-note">备注</label>
+       <input id="fb-note" type="text" placeholder="备注（可选）：比如“跑完超爽，后悔没早去”">
+      </div>
+      <button id="btn-feedback" class="btn btn-primary" type="button">提交打卡</button>
+      <p id="fb-done" class="fb-done hidden">✅ 已记住，下次推荐会更懂你。</p>
+    </div>
+
+    <div class="result-foot">
+      <button id="btn-new-question" class="btn btn-ghost" type="button">🔁 再问一个新纠结</button>
+    </div>
+  </div>
+
+  <!-- ---------- 错误提示 ---------- -->
+  <div id="view-error" class="view hidden">
+    <div class="card glass error-card">
+      <div class="error-emoji">🌧️</div>
+      <h3 id="error-title">后端还没准备好</h3>
+      <p id="error-msg" class="error-msg"></p>
+      <div class="error-actions">
+        <button id="btn-retry" class="btn btn-primary" type="button">重试</button>
+        <a id="btn-mock" class="btn btn-ghost" href="?mock=1">用演示数据看看</a>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ============================================================ -->
+<!-- Tab 2 · 我的档案 -->
+<!-- ============================================================ -->
+<section id="tab-profile" class="tab-panel hidden">
+  <div class="page-head">
+    <h2>👤 我的档案</h2>
+    <p class="page-sub">AI 就是看着这些，才敢替你拿主意。</p>
+  </div>
+  <div class="profile-grid">
+    <div class="card glass prof-card">
+      <h3>🎯 目标</h3>
+      <div id="prof-goals" class="prof-list"><span class="hint">加载中…</span></div>
+    </div>
+    <div class="card glass prof-card">
+      <h3>📌 长期事实</h3>
+      <div id="prof-facts" class="prof-list"><span class="hint">加载中…</span></div>
+    </div>
+    <div class="card glass prof-card">
+      <h3>🧠 AI 学到的权重<span class="hint">（你每次打卡都会微调它）</span></h3>
+      <div id="prof-weights" class="weight-list"><span class="hint">加载中…</span></div>
+    </div>
+    <div class="card glass prof-card">
+      <h3>🗓 历史活动</h3>
+      <div id="prof-history" class="prof-list"><span class="hint">加载中…</span></div>
+    </div>
+  </div>
+
+  <div class="card glass preset-card">
+    <h3>🎛 演示开关</h3>
+    <p class="hint">切换档案后，用同一个纠结问一遍，看看新/老用户得到的建议有什么不同。</p>
+    <div class="preset-row">
+      <button id="btn-reset-new" class="btn btn-ghost" type="button">重置为新用户</button>
+      <button id="btn-reset-veteran" class="btn btn-ghost" type="button">载入 3 周老用户</button>
+    </div>
+  </div>
+
+  <div class="card glass log-card">
+    <h3>✍️ 记录一条活动</h3>
+    <p class="hint">告诉 AI 你最近干了什么（比如“昨晚去健身房跑步 60 分钟”），节律维度才算得准。</p>
+    <div class="log-grid">
+      <input id="log-activity" type="text" placeholder="活动，如：去健身房跑步">
+      <select id="log-category">
+        <option value="workout">运动健身</option>
+        <option value="dance">跳舞</option>
+        <option value="theme_park">游乐园</option>
+        <option value="food">吃饭</option>
+        <option value="social">社交</option>
+        <option value="rest">休息</option>
+        <option value="study">学习</option>
+        <option value="other">其他</option>
+      </select>
+      <input id="log-duration" type="number" min="1" placeholder="分钟">
+      <select id="log-mood">
+        <option value="5">😍 超开心</option>
+        <option value="4">🙂 不错</option>
+        <option value="3" selected>😐 一般</option>
+        <option value="2">😕 有点累</option>
+        <option value="1">😫 很差</option>
+      </select>
+      <button id="btn-log" class="btn btn-primary" type="button">记一笔</button>
+    </div>
+    <p id="log-msg" class="hint hidden"></p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- Tab 3 · 历史决策 -->
+<!-- ============================================================ -->
+<section id="tab-history" class="tab-panel hidden">
+  <div class="page-head">
+    <h2>🗂 历史决策</h2>
+    <p class="page-sub">每一次纠结都算数，AI 都记着呢。</p>
+  </div>
+  <div id="history-list" class="history-list">
+    <div class="card glass"><p class="hint">加载中…</p></div>
+  </div>
+</section>
+
+</main>
+
+<!-- ===================== 历史详情弹层 ===================== -->
+<div id="modal-history" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-mask" data-close="1"></div>
+  <div class="modal-box glass">
+    <div class="modal-head">
+      <h3>决策详情</h3>
+      <button id="btn-modal-close" class="btn-close" type="button" aria-label="关闭">✕</button>
+    </div>
+    <div id="modal-body" class="modal-body"></div>
+  </div>
+</div>
+
+<!-- ===================== 轻提示 ===================== -->
+<div id="toast" class="toast hidden"></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

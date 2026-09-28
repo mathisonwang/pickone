@@ -1,0 +1,77 @@
+# ============================================================
+# PickOne — .gitignore
+# 目标：仓库只放代码与文档，不放运行期数据、模型权重、本地依赖
+# ============================================================
+
+# ---------- 运行期数据（含用户档案、决策记录、日志）----------
+data/
+!data/.gitkeep
+
+# ---------- ASR 模型权重（464MB，按需本地安装）----------
+asr/models/
+asr/.local/
+asr/.tmp/
+asr/__pycache__/
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.venv/
+venv/
+env/
+
+# ---------- 测试运行日志（每次跑都变，不入库）----------
+tests/LATEST_RUN.txt
+
+# ---------- 日志 / 临时 / PID ----------
+*.log
+*.pid
+*.lock
+*.tmp
+.DS_Store
+Thumbs.db
+
+# ---------- IDE / 编辑器 ----------
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ---------- 敏感信息（绝不入库）----------
+*.token
+*.secret
+.env
+.env.*
+my_tokens.yaml
+.my_tokens.yaml
+
+# ---------- snapshot（可能含用户原话与工具输出）----------
+*.snapshot
+snapshots/
+
+# ---------- web/static 是指向自身的符号链接（本地静态服务用，不入库）----------
+web/static
+
+# ---------- 视频制作中间产物（帧序列/中间mp4/配音raw，体积大且无需版本控制）----------
+video/shots/
+video/out/
+video/vo/
+video/frames/
+video/audio/
+video/BGM/
+video/*.bak
+video/*.bak2
+video/*_bak/
+video/vo_movie_bak/
+video/__pycache__/
+video/
+*.mp4
+*.bak
+*.bak2

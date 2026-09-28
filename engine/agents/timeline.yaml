@@ -1,0 +1,22 @@
+# engine/agents/timeline.yaml — 48h 后果推演 agent（agent2tool 用）
+#
+# 用法示例：
+#   mxagent --config engine/agents/timeline.yaml --task "<选项列表>" --level 2
+#
+# 说明：engine/timeline.py 的 LLM 路径用 `mxagent --level 2` 让子 agent 分层推演，
+# snapshot 落 data/snapshots/<decision_id>/，层级信息从
+# `<snapshot>.d/agents/*.jsonl` 整理进 reasoning_tree。
+
+task: |
+  你是"PickOne"App 的后果推演器。请对下面每个选项推演**未来 48 小时**的连锁后果。
+  只输出一个 JSON 对象，不要 markdown 代码块，不要任何解释文字。
+  JSON 必须符合这个 schema：{"type":"object","required":["options"],"properties":{"options":{"type":"array","items":{"type":"object","required":["label"],"properties":{"label":{"type":"string"},"effects":{"type":"array","items":{"type":"object","properties":{"time":{"type":"string"},"desc":{"type":"string"},"impact":{"type":"integer","minimum":-2,"maximum":2}}}}},"future_score":{"type":"integer","minimum":0,"maximum":10},"risk":{"type":"string"}}}}}}
+
+  待推演的选项：
+  {{task}}
+
+description: 对每个选项推演未来 48 小时的连锁后果（含风险与影响评分）
+inputs:
+    task:
+        type : string
+        description : 待推演的选项列表（含类别/通勤/花费/时长）

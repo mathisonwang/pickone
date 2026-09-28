@@ -1,0 +1,27 @@
+# engine/agents/explainer.yaml — 三张牌解释 agent（agent2tool 用）
+#
+# 用法示例：
+#   mxagent --config engine/agents/explainer.yaml --task "<打分结果 + 档案>"
+#
+# 说明：engine/explainer.py 的三张牌与理由是**确定性生成**（不调 LLM），
+# 保证同输入同输出、可单测、降级不崩。本 yaml 用于把"润色理由"作为
+# 可选的 LLM 增强能力沉淀下来（默认不启用，避免算术被 LLM 污染）。
+
+task: |
+  你是"PickOne"App 的解释器。请把下面的打分结果润色成用户看得懂的三张牌理由。
+  只输出一个 JSON 对象，不要 markdown 代码块，不要任何解释文字。
+  JSON 必须符合这个 schema：{"type":"object","properties":{"cards":{"type":"array","items":{"type":"object","required":["kind","title"],"properties":{"kind":{"type":"string","enum":["GO","SWITCH","DROP"]},"option_id":{"type":["string","null"]},"title":{"type":"string"},"why":{"type":"array","items":{"type":"string"}},"detail":{"type":"string"}}}}},"most_uncertain":{"type":"string"},"ask_user":{"type":"string"}}}
+
+  打分结果与档案：
+  {{task}}
+
+  硬性要求：
+  1. 理由必须引用档案里的具体证据（如"你已经 4 天没运动"），不要泛泛而谈。
+  2. 严禁输出占位文案。
+  3. 每张牌 why 不超过 4 条，每条不超过 40 字。
+
+description: 把确定性打分结果润色成可解释的三张牌理由（可选 LLM 增强）
+inputs:
+    task:
+        type : string
+        description : 打分结果 + 用户档案证据
