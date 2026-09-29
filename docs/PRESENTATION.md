@@ -6,7 +6,7 @@
 | 项 | 内容 |
 |---|---|
 | 项目 | PickOne — 可解释决策引擎 |
-| 底座框架 | mxagent v0.1.123（NVIDIA MMPLEX team in-house 分层多智能体框架） |
+| 底座框架 | mxagent v0.1.123（NVIDIA MMPLEX team 出品，分层多智能体框架） |
 | 运行环境 | 赞奇 DGX Spark（NVIDIA GB10），hostname `spark-4cf2` |
 | LLM 来源 | 本地 llama-server `Qwen3.8-Flash-Next-UD-Q4_K_XL` + stepfun API |
 | 交付规模 | 53 个文件 / 9.39MB / 67 项测试全绿 / 67.7s 演示视频 |
@@ -20,7 +20,7 @@
 
 ## 1.1 定位：一个纯 CLI 的智能体框架
 
-mxagent 是 **NVIDIA MMPLEX team 的 in-house agent 框架**，**自 2025 年 3 月起开发**，形态是**纯 CLI agent**——一个命令行程序就是全部，没有服务端、没有控制台、没有消息队列。它的设计目标很直接：**做领先市面上所有的 CLI agent**。
+mxagent 是 **NVIDIA MMPLEX team 出品的 agent 框架**，**自 2025 年 3 月起开发**，形态是**纯 CLI agent**——一个命令行程序就是全部，没有服务端、没有控制台、没有消息队列。它的设计目标很直接：**做领先市面上所有的 CLI agent**。
 
 这个定位不是营销话术，而是可以被逐条验证的工程事实。当前版本 **0.1.123**，**2.4MB 纯 Python，无重依赖**。一个 CLI 程序里塞进了层级多智能体、会话快照、工具闸门、技能系统、MCP 集成和一整套 Python API。
 
@@ -185,7 +185,7 @@ def censor(name, argv, kwargs) -> Optional[str]:  # 返回字符串即拒绝并�
 | `MXAGENT_BIN` 环境变量 | 指向不存在的可执行文件即整体降级 | 韧性演示不需要改代码 |
 | workspace 沙箱 + 只读环境变量 | 5 个并行子 agent 各写各的目录，互不越界 | 不需要额外的权限隔离层 |
 
-最后一行值得多说一句：**并行开发的安全性不是靠"叮嘱 agent 别改别人文件"保证的，是靠框架的沙箱保证的。** 这是 in-house 框架相对"自己拼 LangChain"最实际的差别——约束在基础设施里，不在提示词里。
+最后一行值得多说一句：**并行开发的安全性不是靠"叮嘱 agent 别改别人文件"保证的，是靠框架的沙箱保证的。** 这是 mxagent 相对"自己拼 LangChain"最实际的差别——约束在基础设施里，不在提示词里。
 
 ## 2.5 几点复盘
 
