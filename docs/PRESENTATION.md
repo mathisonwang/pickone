@@ -8,7 +8,7 @@
 | 项目 | PickOne — 可解释决策引擎 |
 | 底座框架 | mxagent v0.1.123（NVIDIA MMPLEX team 出品，分层多智能体框架） |
 | 运行环境 | 赞奇 DGX Spark（NVIDIA GB10），hostname `spark-4cf2` |
-| LLM 来源 | 本地 llama-server `Qwen3.8-Flash-Next-UD-Q4_K_XL` + stepfun API |
+| LLM 来源 | 建造者（MIAO）用 stepfun API；被建造的 PickOne 用本地 llama-server `Qwen3.8-Flash-Next-UD-Q4_K_XL` |
 | 交付规模 | 53 个文件 / 9.39MB / 67 项测试全绿 / 67.7s 演示视频 |
 | 代码仓库 | `github.com/mathisonwang/pickone` |
 
@@ -133,8 +133,8 @@ def censor(name, argv, kwargs) -> Optional[str]:  # 返回字符串即拒绝并�
 |---|---|
 | 机器 | 赞奇 DGX Spark，GPU NVIDIA GB10，hostname `spark-4cf2` |
 | mxagent | v0.1.123，装在 `/home/Developer/workspace/.venv` |
-| LLM 端点 | `~/.my_tokens.yaml` active endpoint 为 `stepfun`（`https://api.stepfun.com/step_plan/v1`） |
-| 本地模型 | llama-server 跑 `Qwen3.8-Flash-Next-UD-Q4_K_XL`，`--parallel 1`，262144 context |
+| 建造者的 LLM | `~/.token_stepfun.yaml` active endpoint 为 `stepfun`（`https://api.stepfun.com/step_plan/v1`） |
+| PickOne 的 LLM | 本地 llama-server 跑 `Qwen3.8-Flash-Next-UD-Q4_K_XL`，`--parallel 1`，262144 context；由 agent 自行部署 |
 
 ## 2.2 开发历程
 
@@ -152,11 +152,11 @@ def censor(name, argv, kwargs) -> Optional[str]:  # 返回字符串即拒绝并�
 | `qa_demo` | unittest 套件 + 健壮性测试 + 5 分钟现场演示台本 |
 | `asr_dev` | 本地 whisper 离线语音识别 |
 
-**阶段 3 · 集成与 debug（主 agent 亲自做）。** 前端资源 404（相对路径 vs `/static/*`）；404/405 返回非 JSON；重启后任务永久卡 running（加启动清扫）；LLM 慢无兜底（150s 硬超时 + 前端快速模式按钮）；`--model qwen3.8-flash-next` 让 mxagent 直接退出 1（alias 能被 `--list` 列出却不能传给 `--model`，且失败时不写 snapshot）；LLM JSON 解析 100% 失败（终端折行在 JSON 字符串中间插真实换行，还把 `"start_hint"` 污染成 `"sta rt_hint"`）；veteran 档案"最近跳舞在 1 天前"与核心演示矛盾（改成 4 天前）。
+**阶段 3 · 集成与 debug（主 agent 亲自做）。** 前端资源 404（相对路径 vs `/static/*`）；404/405 返回非 JSON；重启后任务永久卡 running（加启动清扫）；LLM 慢无兜底（150s 硬超时 + 前端快速模式按钮）；`--model qwen3.8-flash-next` 让 mxagent 直接退出 1（alias 能被 `--list` 列出却不能传给 `--model`，且失败时不写 snapshot）；LLM JSON 解析 100% 失败（终端折行在 JSON 字符串中间插真实换行，还把 `"start_hint"` 污染成 `"sta rt_hint"`）；veteran 档案"最近一次运动在 1 天前"与核心演示矛盾（改成 4 天前）。
 
 **阶段 4 · 视频制作（4 个子 agent）。** 技术验证：Chrome headless + CDP 逐帧录屏 + edge-tts 配音 + ffmpeg 合成；脚本分镜：8 镜结构 + 金句 + 禁用词表；录屏：fetch 拦截注入预跑数据（结果页 1.5s 出 vs 真实 43s）；配音合成：23 句 YunjianNeural + BGM + 字幕烧录。
 
-**阶段 5 · 反复打磨（用户反馈驱动）。** 三张牌 → 只给一个结论（产品最重要的判断）；案例从"跳舞"换成"健身/火锅/看电影"（代码 120 处 + 文档 92 处）；标题定为 Attention is what we save.；视频解说词从技术视角改成用户视角（删去 python / mxagent / LLM 等词）；节奏：edge-tts padding 裁切（1.19s → 0.213s，提速 5.6 倍）；静音加速：分段线性映射表，17 段全部 ≤3.5s；字幕逗号 bug：ASS Format 行漏声明 `MarginV`，被 libass 吞掉分隔逗号；产品文案收敛为"答案有了，去就行。"
+**阶段 5 · 反复打磨（用户反馈驱动）。** 三张牌 → 只给一个结论（产品最重要的判断）；案例换成普通人每周都会遇到的日常场景（代码 120 处 + 文档 92 处）；标题定为 Attention is what we save.；视频解说词从技术视角改成用户视角（删去 python / mxagent / LLM 等词）；节奏：edge-tts padding 裁切（1.19s → 0.213s，提速 5.6 倍）；静音加速：分段线性映射表，17 段全部 ≤3.5s；字幕逗号 bug：ASS Format 行漏声明 `MarginV`，被 libass 吞掉分隔逗号；产品文案收敛为"答案有了，去就行。"
 
 **阶段 6 · 交付。** GitHub 仓库清理（578M → 9.39MB，移除视频中间产物），产出报告书、征文与演示视频。
 
@@ -189,7 +189,7 @@ def censor(name, argv, kwargs) -> Optional[str]:  # 返回字符串即拒绝并�
 
 ## 2.5 几点复盘
 
-**契约先行的收益是滞后的。** 阶段 5 把案例从"跳舞"整体换成"健身/火锅/看电影"，grep 命中代码 120 处、文档 92 处，但因为字段名早在 `contracts/data_model.md` 里定死，动的只有数据，没有一处接口签名。如果当初边写边定，这次替换会变成一次重构。
+**契约先行的收益是滞后的。** 阶段 5 把案例整体换成普通人的日常场景，grep 命中代码 120 处、文档 92 处，但因为字段名早在 `contracts/data_model.md` 里定死，动的只有数据，没有一处接口签名。如果当初边写边定，这次替换会变成一次重构。
 
 **框架的边界要实测，不能读文档。** `--model qwen3.8-flash-next` 让 mxagent 直接退出 1——这个 alias 能被 `--list models` 正常列出，却不能作为 `--model` 的实参，且失败时不写 snapshot。这类细节文档不会写，只有真跑一次才知道。阶段 0 那 7 项机制实测，是后面所有架构决策的地基。
 
@@ -203,4 +203,4 @@ def censor(name, argv, kwargs) -> Optional[str]:  # 返回字符串即拒绝并�
 
 **感谢赞奇提供的 DGX Spark** —— 让 agent 有了一台可以自己动手的家。
 
-整个项目是在 Spark 上运行 mxagent、接入 stepfun 提供的 API，让 agent 自己在 Spark 上完成开发：从本地部署 model，到项目实现、测试、提交、录制视频，全部由 agent 自主完成。
+整个项目是在 Spark 上跑 mxagent 完成的：建造者（MIAO）接入 stepfun 提供的 API，被建造的 PickOne 用本地部署的 Qwen 模型。从本地部署 model，到项目实现、测试、提交、录制视频，全部由 agent 自主完成。
